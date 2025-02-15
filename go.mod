@@ -5,7 +5,7 @@ go 1.23.4
 require (
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
-	github.com/go-playground/validator/v10 v10.24.0
+	github.com/go-playground/validator/v10 v10.25.0
 	github.com/gorilla/mux v1.8.1
 	github.com/rs/cors v1.11.1
 	github.com/ygo-skc/skc-go/common v0.0.0-20250125045254-48cc27863616
