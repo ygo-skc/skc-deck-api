@@ -1,6 +1,6 @@
 module github.com/ygo-skc/skc-deck-api
 
-go 1.23.4
+go 1.24
 
 require (
 	github.com/go-playground/locales v0.14.1
