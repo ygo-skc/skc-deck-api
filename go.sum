@@ -38,6 +38,8 @@ github.com/xdg-go/stringprep v1.0.4 h1:XLI/Ng3O1Atzq0oBs3TWm+5ZVgkq2aqdlvP9JtoZ6
 github.com/xdg-go/stringprep v1.0.4/go.mod h1:mPGuuIYwz7CmR2bT9j4GbQqutWS1zV24gijq1dTyGkM=
 github.com/ygo-skc/skc-go/common v0.0.0-20250125045254-48cc27863616 h1:J2m5Bj+S4lIVRa7Z3aHdty5yQqQ2ZxOl4dsOr7UZjlI=
 github.com/ygo-skc/skc-go/common v0.0.0-20250125045254-48cc27863616/go.mod h1:I7hlZQAy93K7TRVlawKjOpdvyWRtmT7mGJFNYLe6GMo=
+github.com/ygo-skc/skc-go/common v0.0.0-20250319112659-0ac9554693dd h1:lJ2GTJYgO7BRaaAPA1QP5qGMmEvLdMOaHvGehtWNruA=
+github.com/ygo-skc/skc-go/common v0.0.0-20250319112659-0ac9554693dd/go.mod h1:I7hlZQAy93K7TRVlawKjOpdvyWRtmT7mGJFNYLe6GMo=
 github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 h1:ilQV1hzziu+LLM3zUTJ0trRztfwgjqKnBWNtSRkbmwM=
 github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78/go.mod h1:aL8wCCfTfSfmXjznFBSZNN13rSJjlIOI1fUNAtF7rmI=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
