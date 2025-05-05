@@ -72,12 +72,12 @@ func (dlb *DeckListBreakdown) Sort() {
 func (dlb *DeckListBreakdown) GetQuantities() ([]Content, []Content) {
 	mainDeckContent := make([]Content, 0, len(dlb.MainDeck))
 	for _, card := range dlb.MainDeck {
-		mainDeckContent = append(mainDeckContent, Content{Card: card, Quantity: dlb.CardQuantity[card.CardID]})
+		mainDeckContent = append(mainDeckContent, Content{Card: card, Quantity: dlb.CardQuantity[card.ID]})
 	}
 
 	extraDeckContent := make([]Content, 0, len(dlb.ExtraDeck))
 	for _, card := range dlb.ExtraDeck {
-		extraDeckContent = append(extraDeckContent, Content{Card: card, Quantity: dlb.CardQuantity[card.CardID]})
+		extraDeckContent = append(extraDeckContent, Content{Card: card, Quantity: dlb.CardQuantity[card.ID]})
 	}
 
 	return mainDeckContent, extraDeckContent
@@ -87,20 +87,20 @@ func (dlb DeckListBreakdown) ListStringCleanup() string {
 	formattedDLS := "Main Deck\n"
 
 	for _, card := range dlb.MainDeck {
-		formattedDLS += formattedLine(card, dlb.CardQuantity[card.CardID])
+		formattedDLS += formattedLine(card, dlb.CardQuantity[card.ID])
 	}
 
 	formattedDLS += "\nExtra Deck\n"
 
 	for _, card := range dlb.ExtraDeck {
-		formattedDLS += formattedLine(card, dlb.CardQuantity[card.CardID])
+		formattedDLS += formattedLine(card, dlb.CardQuantity[card.ID])
 	}
 
 	return formattedDLS
 }
 
 func formattedLine(card cModel.Card, quantity int) string {
-	return fmt.Sprintf("%dx%s|%s\n", quantity, card.CardID, card.CardName)
+	return fmt.Sprintf("%dx%s|%s\n", quantity, card.ID, card.Name)
 }
 
 func (dlb DeckListBreakdown) Validate(ctx context.Context) *cModel.APIError {

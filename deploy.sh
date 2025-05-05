@@ -8,7 +8,7 @@ USER="ec2-user"
 DIR_ON_SERVER="api/skc-deck-api"
 
 echo "Building API"
-env GOOS=linux GOARCH=arm64 go build .
+env GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" .
 
 echo "Using server $SERVER and directory $DIR_ON_SERVER to sync prod API"
 

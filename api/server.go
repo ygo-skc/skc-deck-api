@@ -8,7 +8,6 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -121,16 +120,8 @@ func RunHttpServer() {
 func serveTLS(router *mux.Router, corsOpts *cors.Cors) {
 	slog.Debug("Starting server in port 9010 (secured)")
 
-	combinedFile := "certs/concatenated.crt"
-	if certData, err := os.ReadFile("certs/certificate.crt"); err != nil {
-		log.Fatalf("Failed to read certificate file: %s", err)
-	} else if caBundleData, err := os.ReadFile("certs/ca_bundle.crt"); err != nil {
-		log.Fatalf("Failed to read CA bundle file: %s", err)
-	} else {
-		if err = os.WriteFile(combinedFile, append(certData, caBundleData...), 0600); err != nil {
-			log.Fatalf("Failed to write combined certificate file: %s", err)
-		} else if err := http.ListenAndServeTLS(":9010", combinedFile, "certs/private.key", corsOpts.Handler(router)); err != nil {
-			log.Fatalf("There was an error starting api server: %s", err)
-		}
+	cUtil.CombineCerts("certs")
+	if err := http.ListenAndServeTLS(":9010", "certs/concatenated.crt", "certs/private.key", corsOpts.Handler(router)); err != nil {
+		log.Fatalf("There was an error starting api server: %s", err)
 	}
 }

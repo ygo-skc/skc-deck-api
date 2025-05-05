@@ -1,6 +1,6 @@
 module github.com/ygo-skc/skc-deck-api
 
-go 1.24
+go 1.24.2
 
 require (
 	github.com/go-playground/locales v0.14.1
@@ -8,7 +8,7 @@ require (
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/gorilla/mux v1.8.1
 	github.com/rs/cors v1.11.1
-	github.com/ygo-skc/skc-go/common v0.0.0-20250319112659-0ac9554693dd
+	github.com/ygo-skc/skc-go/common v0.0.0-20250505152348-b501a9b24d6b
 	go.mongodb.org/mongo-driver/v2 v2.2.0
 )
 
@@ -24,8 +24,11 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	golang.org/x/crypto v0.33.0 // indirect
-	golang.org/x/net v0.34.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a // indirect
+	google.golang.org/grpc v1.72.0 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 )
