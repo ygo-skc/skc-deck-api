@@ -1,15 +1,14 @@
 package downstream
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	cModel "github.com/ygo-skc/skc-go/common/model"
 	cUtil "github.com/ygo-skc/skc-go/common/util"
+	"github.com/ygo-skc/skc-go/common/ygo"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -22,37 +21,21 @@ func FetchBatchCardData(ctx context.Context, cardIDs []string) (*cModel.BatchCar
 	logger := cUtil.LoggerFromContext(ctx)
 	logger.Info(fmt.Sprintf("Fetching card info for the following IDs: %v", cardIDs))
 
-	var resp *http.Response
+	var cards *ygo.Cards
 	var err error
 
-	reqBody := new(bytes.Buffer)
-	json.NewEncoder(reqBody).Encode(cModel.BatchCardIDs{CardIDs: cardIDs})
-
-	if resp, err = suggestionEngineClient.Post(
-		fmt.Sprintf("https://skc-suggestion-engine:9000%s", BATCH_CARD_INFO_ENDPOINT), "application/json", reqBody); err != nil {
+	if cards, err = ygoServiceClient.QueryCards(ctx, &ygo.Resources{IDs: cardIDs}); err != nil {
 		logger.Error(
-			fmt.Sprintf("There was an issue calling Suggestion Engine. Operation: %s. Error: %s",
-				BATCH_CARD_INFO_OPERATION, err))
-		return nil, &cModel.APIError{Message: BATCH_CARD_INFO_ERROR, StatusCode: http.StatusInternalServerError}
-	} else {
-		defer resp.Body.Close()
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		s, _ := io.ReadAll(resp.Body)
-		logger.Error(
-			fmt.Sprintf("Suggestion Engine returned with non 200 status. Operation: %s. Body: %s. Code: %d",
-				BATCH_CARD_INFO_OPERATION, string(s), resp.StatusCode))
+			fmt.Sprintf("There was an issue calling YGO Service. Operation: %s. Code %s. Error: %s",
+				BATCH_CARD_INFO_OPERATION,
+				status.Code(err),
+				err))
 		return nil, &cModel.APIError{Message: BATCH_CARD_INFO_ERROR, StatusCode: http.StatusInternalServerError}
 	}
 
-	var cardData cModel.BatchCardData[cModel.CardIDs]
-	if err = json.NewDecoder(resp.Body).Decode(&cardData); err != nil && err != io.EOF {
-		logger.Error(
-			fmt.Sprintf("Error occurred while deserializing output from Suggestion Engine. Operation: %s. Error %v",
-				BATCH_CARD_INFO_OPERATION, err))
-		return nil, &cModel.APIError{Message: BATCH_CARD_INFO_ERROR, StatusCode: http.StatusInternalServerError}
+	batchCardData := make(cModel.CardDataMap, len(cards.CardInfo))
+	for k, v := range cards.CardInfo {
+		batchCardData[k] = cModel.YGOCard{Card: v}
 	}
-
-	return &cardData, nil
+	return &cModel.BatchCardData[cModel.CardIDs]{CardInfo: batchCardData, UnknownResources: cards.UnknownResources}, nil
 }

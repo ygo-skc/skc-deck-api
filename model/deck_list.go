@@ -32,8 +32,8 @@ type DeckList struct {
 }
 
 type Content struct {
-	Quantity int         `bson:"omitempty" json:"quantity"`
-	Card     cModel.Card `bson:"omitempty" json:"card"`
+	Quantity int                   `bson:"omitempty" json:"quantity"`
+	Card     cModel.CardDescriptor `bson:"omitempty" json:"card"`
 }
 
 type DeckListBreakdown struct {
@@ -41,19 +41,19 @@ type DeckListBreakdown struct {
 	CardIDs           cModel.CardIDs
 	InvalidIDs        cModel.CardIDs
 	AllCards          cModel.CardDataMap
-	MainDeck          cModel.Cards
-	ExtraDeck         cModel.Cards
+	MainDeck          cModel.CardDescriptors
+	ExtraDeck         cModel.CardDescriptors
 	NumMainDeckCards  int
 	NumExtraDeckCards int
 }
 
 func (dlb *DeckListBreakdown) Partition() {
-	dlb.MainDeck, dlb.ExtraDeck = []cModel.Card{}, []cModel.Card{}
+	dlb.MainDeck, dlb.ExtraDeck = []cModel.CardDescriptor{}, []cModel.CardDescriptor{}
 	dlb.NumMainDeckCards, dlb.NumExtraDeckCards = 0, 0
 
 	for _, cardID := range dlb.CardIDs {
 		if _, isPresent := dlb.AllCards[cardID]; isPresent {
-			if dlb.AllCards[cardID].IsExtraDeckMonster() {
+			if cModel.IsExtraDeckMonster(dlb.AllCards[cardID]) {
 				dlb.ExtraDeck = append(dlb.ExtraDeck, dlb.AllCards[cardID])
 				dlb.NumExtraDeckCards += dlb.CardQuantity[cardID]
 			} else {
@@ -72,12 +72,12 @@ func (dlb *DeckListBreakdown) Sort() {
 func (dlb *DeckListBreakdown) GetQuantities() ([]Content, []Content) {
 	mainDeckContent := make([]Content, 0, len(dlb.MainDeck))
 	for _, card := range dlb.MainDeck {
-		mainDeckContent = append(mainDeckContent, Content{Card: card, Quantity: dlb.CardQuantity[card.ID]})
+		mainDeckContent = append(mainDeckContent, Content{Card: card, Quantity: dlb.CardQuantity[card.GetID()]})
 	}
 
 	extraDeckContent := make([]Content, 0, len(dlb.ExtraDeck))
 	for _, card := range dlb.ExtraDeck {
-		extraDeckContent = append(extraDeckContent, Content{Card: card, Quantity: dlb.CardQuantity[card.ID]})
+		extraDeckContent = append(extraDeckContent, Content{Card: card, Quantity: dlb.CardQuantity[card.GetID()]})
 	}
 
 	return mainDeckContent, extraDeckContent
@@ -87,20 +87,20 @@ func (dlb DeckListBreakdown) ListStringCleanup() string {
 	formattedDLS := "Main Deck\n"
 
 	for _, card := range dlb.MainDeck {
-		formattedDLS += formattedLine(card, dlb.CardQuantity[card.ID])
+		formattedDLS += formattedLine(card, dlb.CardQuantity[card.GetID()])
 	}
 
 	formattedDLS += "\nExtra Deck\n"
 
 	for _, card := range dlb.ExtraDeck {
-		formattedDLS += formattedLine(card, dlb.CardQuantity[card.ID])
+		formattedDLS += formattedLine(card, dlb.CardQuantity[card.GetID()])
 	}
 
 	return formattedDLS
 }
 
-func formattedLine(card cModel.Card, quantity int) string {
-	return fmt.Sprintf("%dx%s|%s\n", quantity, card.ID, card.Name)
+func formattedLine(card cModel.CardDescriptor, quantity int) string {
+	return fmt.Sprintf("%dx%s|%s\n", quantity, card.GetID(), card.GetName())
 }
 
 func (dlb DeckListBreakdown) Validate(ctx context.Context) *cModel.APIError {
