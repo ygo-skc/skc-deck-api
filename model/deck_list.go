@@ -32,8 +32,8 @@ type DeckList struct {
 }
 
 type Content struct {
-	Quantity int                   `bson:"omitempty" json:"quantity"`
-	Card     cModel.CardDescriptor `bson:"omitempty" json:"card"`
+	Quantity int            `bson:"omitempty" json:"quantity"`
+	Card     cModel.YGOCard `bson:"omitempty" json:"card"`
 }
 
 type DeckListBreakdown struct {
@@ -41,14 +41,14 @@ type DeckListBreakdown struct {
 	CardIDs           cModel.CardIDs
 	InvalidIDs        cModel.CardIDs
 	AllCards          cModel.CardDataMap
-	MainDeck          cModel.CardDescriptors
-	ExtraDeck         cModel.CardDescriptors
+	MainDeck          cModel.YGOCards
+	ExtraDeck         cModel.YGOCards
 	NumMainDeckCards  int
 	NumExtraDeckCards int
 }
 
 func (dlb *DeckListBreakdown) Partition() {
-	dlb.MainDeck, dlb.ExtraDeck = []cModel.CardDescriptor{}, []cModel.CardDescriptor{}
+	dlb.MainDeck, dlb.ExtraDeck = []cModel.YGOCard{}, []cModel.YGOCard{}
 	dlb.NumMainDeckCards, dlb.NumExtraDeckCards = 0, 0
 
 	for _, cardID := range dlb.CardIDs {
@@ -99,7 +99,7 @@ func (dlb DeckListBreakdown) ListStringCleanup() string {
 	return formattedDLS
 }
 
-func formattedLine(card cModel.CardDescriptor, quantity int) string {
+func formattedLine(card cModel.YGOCard, quantity int) string {
 	return fmt.Sprintf("%dx%s|%s\n", quantity, card.GetID(), card.GetName())
 }
 

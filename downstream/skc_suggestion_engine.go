@@ -35,7 +35,7 @@ func FetchBatchCardData(ctx context.Context, cardIDs []string) (*cModel.BatchCar
 
 	batchCardData := make(cModel.CardDataMap, len(cards.CardInfo))
 	for k, v := range cards.CardInfo {
-		batchCardData[k] = cModel.YGOCard{Card: v}
+		batchCardData[k] = cModel.YGOCardGRPC{Card: v}
 	}
 	return &cModel.BatchCardData[cModel.CardIDs]{CardInfo: batchCardData, UnknownResources: cards.UnknownResources}, nil
 }

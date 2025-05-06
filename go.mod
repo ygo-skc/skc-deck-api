@@ -8,7 +8,7 @@ require (
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/gorilla/mux v1.8.1
 	github.com/rs/cors v1.11.1
-	github.com/ygo-skc/skc-go/common v0.0.0-20250506043733-2e76038f26f6
+	github.com/ygo-skc/skc-go/common v1.0.0
 	go.mongodb.org/mongo-driver/v2 v2.2.0
 	google.golang.org/grpc v1.72.0
 )

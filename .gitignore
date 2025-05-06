@@ -28,7 +28,7 @@ settings.json
 
 # Senseitve Files
 .env*
-certs/*
+certs
 data/*.BIN
 coverage.*
 
