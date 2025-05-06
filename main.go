@@ -7,6 +7,7 @@ import (
 	"github.com/ygo-skc/skc-deck-api/api"
 	"github.com/ygo-skc/skc-deck-api/db"
 	cUtil "github.com/ygo-skc/skc-go/common/util"
+	_ "google.golang.org/grpc/encoding/gzip"
 )
 
 const (
