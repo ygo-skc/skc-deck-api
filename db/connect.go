@@ -29,10 +29,11 @@ func EstablishSKCDeckAPIDBConn() {
 		ApplyURI(uri).
 		SetAuth(credential).
 		SetMaxPoolSize(maxPoolSize).
-		SetMaxConnIdleTime(10 * time.Minute).
+		SetMaxConnIdleTime(20 * time.Minute).
 		SetTimeout(2 * time.Second).
 		SetReadConcern(readconcern.Majority()).   // prefer strongly consistent reeds
 		SetWriteConcern(writeconcern.Majority()). // writes to most replicas before acknowledging the write is complete
+		SetCompressors([]string{"zlib"}).
 		SetAppName("SKC Deck API")); err != nil {
 		log.Fatalln("Error creating new mongodb client for skc-deck-api-db", err)
 	} else {
