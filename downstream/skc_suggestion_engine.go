@@ -24,7 +24,7 @@ func FetchBatchCardData(ctx context.Context, cardIDs []string) (*cModel.BatchCar
 	var cards *ygo.Cards
 	var err error
 
-	if cards, err = ygoServiceClient.QueryCards(ctx, &ygo.Resources{IDs: cardIDs}); err != nil {
+	if cards, err = cardServiceClient.QueryCards(ctx, &ygo.Resources{IDs: cardIDs}); err != nil {
 		logger.Error(
 			fmt.Sprintf("There was an issue calling YGO Service. Operation: %s. Code %s. Error: %s",
 				BATCH_CARD_INFO_OPERATION,
