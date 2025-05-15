@@ -107,17 +107,12 @@ func (dlb DeckListBreakdown) Validate(ctx context.Context) *cModel.APIError {
 	var msg = ""
 
 	if len(dlb.InvalidIDs) > 0 {
-		msg = fmt.Sprintf("Deck list contains card(s) that were not found in skc DB. All cards not found in DB: %v", dlb.InvalidIDs)
-	}
-
-	// validate extra deck has correct number of cards
-	if dlb.NumExtraDeckCards > 15 {
+		msg = fmt.Sprintf("Deck list contains card(s) that were not found in skc DB. List of Card ID's not found: %v", dlb.InvalidIDs)
+	} else if dlb.NumExtraDeckCards > 15 { // validate extra deck has correct number of cards
 		msg = fmt.Sprintf("Extra deck cannot contain more than 15 cards. Current deck contains %d extra deck cards.", dlb.NumExtraDeckCards)
-	}
-
-	// validate main deck has correct number of cards
-	if dlb.NumMainDeckCards < 40 || dlb.NumMainDeckCards > 60 {
-		msg = fmt.Sprintf("Main deck cannot contain less than 40 cards and no more than 60 cards. Current deck contains %d main deck cards.", dlb.NumMainDeckCards)
+	} else if dlb.NumMainDeckCards < 40 || dlb.NumMainDeckCards > 60 { // validate main deck has correct number of cards
+		msg = fmt.Sprintf("Main deck cannot contain less than 40 cards and no more than 60 cards. Current deck contains %d main deck cards.",
+			dlb.NumMainDeckCards)
 	}
 
 	if msg != "" {

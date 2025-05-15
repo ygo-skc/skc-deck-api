@@ -11,6 +11,7 @@ import (
 	"github.com/ygo-skc/skc-deck-api/downstream"
 	"github.com/ygo-skc/skc-deck-api/model"
 	cModel "github.com/ygo-skc/skc-go/common/model"
+	"github.com/ygo-skc/skc-go/common/service"
 	cUtil "github.com/ygo-skc/skc-go/common/util"
 )
 
@@ -27,7 +28,7 @@ func DeserializeDeckList(ctx context.Context, dl string) (*model.DeckListBreakdo
 		return nil, err
 	}
 
-	if cardData, err = downstream.FetchBatchCardData(ctx, dlb.CardIDs); err != nil {
+	if cardData, err = service.QueryCards(ctx, downstream.CardServiceClient, dlb.CardIDs, cModel.BatchCardDataFromPB); err != nil {
 		return nil, err
 	} else {
 		dlb.AllCards = cardData.CardInfo
