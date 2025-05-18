@@ -15,8 +15,13 @@ import (
 	cUtil "github.com/ygo-skc/skc-go/common/util"
 )
 
+const (
+	submitNewDeckListOp = "Submit New Deck List"
+)
+
 func submitNewDeckListHandler(res http.ResponseWriter, req *http.Request) {
-	logger, ctx := cUtil.NewRequestSetup(context.Background(), "submit new deck list")
+	logger, ctx := cUtil.NewRequestSetup(
+		cUtil.ContextWithMetadata(context.Background(), apiName, submitNewDeckListOp), submitNewDeckListOp)
 	var deckList model.DeckList
 
 	if err := json.NewDecoder(req.Body).Decode(&deckList); err != nil {

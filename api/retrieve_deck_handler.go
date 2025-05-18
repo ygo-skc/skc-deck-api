@@ -15,11 +15,18 @@ import (
 	cUtil "github.com/ygo-skc/skc-go/common/util"
 )
 
+const (
+	retrieveDeckListOp          = "Retrieve Deck List"
+	retrieveDeckFeaturingCardOp = "Retrieve Deck Featuring Card"
+)
+
 func getDeckListHandler(res http.ResponseWriter, req *http.Request) {
 	pathVars := mux.Vars(req)
 	deckID := pathVars["deckID"]
 
-	logger, ctx := cUtil.NewRequestSetup(context.Background(), "retrieve deck list", slog.String("deckID", deckID))
+	logger, ctx := cUtil.NewRequestSetup(
+		cUtil.ContextWithMetadata(context.Background(), apiName, retrieveDeckListOp),
+		retrieveDeckListOp, slog.String("deck-id", deckID))
 	logger.Info(fmt.Sprintf("Getting content for deck w/ ID %s", deckID))
 
 	var deckList *model.DeckList
@@ -49,7 +56,9 @@ func getDecksFeaturingCardHandler(res http.ResponseWriter, req *http.Request) {
 	pathVars := mux.Vars(req)
 	cardID := pathVars["cardID"]
 
-	logger, ctx := cUtil.NewRequestSetup(context.Background(), "retrieve deck featuring card", slog.String("cardID", cardID))
+	logger, ctx := cUtil.NewRequestSetup(
+		cUtil.ContextWithMetadata(context.Background(), apiName, retrieveDeckFeaturingCardOp),
+		retrieveDeckFeaturingCardOp, slog.String("card-id", cardID))
 	logger.Info("Fetching decks that feature card")
 
 	suggestedDecks := model.SuggestedDecks{}

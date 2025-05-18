@@ -10,10 +10,16 @@ import (
 	cUtil "github.com/ygo-skc/skc-go/common/util"
 )
 
+const (
+	statusOp = "Status"
+)
+
 // Handler for status/health check endpoint of the api.
 // Will get status of downstream services as well to help isolate problems.
 func getAPIStatusHandler(res http.ResponseWriter, req *http.Request) {
-	logger, ctx := cUtil.NewRequestSetup(context.Background(), "status")
+	logger, ctx := cUtil.NewRequestSetup(
+		cUtil.ContextWithMetadata(context.Background(), apiName, statusOp),
+		statusOp)
 
 	downstreamHealth := []cModel.DownstreamItem{}
 

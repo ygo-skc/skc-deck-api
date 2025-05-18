@@ -18,7 +18,8 @@ import (
 )
 
 const (
-	CONTEXT = "/api/v1/deck"
+	apiContext = "/api/v1/deck"
+	apiName    = "skc-deck-api"
 )
 
 var (
@@ -85,14 +86,14 @@ func RunHttpServer() {
 	router := mux.NewRouter()
 
 	// configure non-admin routes
-	unprotectedRoutes := router.PathPrefix(CONTEXT).Subrouter()
+	unprotectedRoutes := router.PathPrefix(apiContext).Subrouter()
 	unprotectedRoutes.HandleFunc("/status", getAPIStatusHandler)
 	unprotectedRoutes.HandleFunc("", submitNewDeckListHandler).Methods(http.MethodPost).Name("Deck List Submission")
 	unprotectedRoutes.HandleFunc("/card/{cardID:[0-9]{8}}", getDecksFeaturingCardHandler).Methods(http.MethodGet).Name("Deck Featuring Card")
 	unprotectedRoutes.HandleFunc("/{deckID:[0-9a-z]+}", getDeckListHandler).Methods(http.MethodGet).Name("Retrieve Info On Deck")
 
 	// admin routes
-	protectedRoutes := router.PathPrefix(CONTEXT).Subrouter()
+	protectedRoutes := router.PathPrefix(apiContext).Subrouter()
 	protectedRoutes.Use(verifyAPIKeyMiddleware)
 
 	// common middleware
