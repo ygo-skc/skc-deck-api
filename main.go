@@ -6,6 +6,7 @@ import (
 
 	"github.com/ygo-skc/skc-deck-api/api"
 	"github.com/ygo-skc/skc-deck-api/db"
+	"github.com/ygo-skc/skc-deck-api/downstream"
 	cUtil "github.com/ygo-skc/skc-go/common/util"
 	_ "google.golang.org/grpc/encoding/gzip"
 )
@@ -22,6 +23,7 @@ func init() {
 }
 
 func main() {
+	downstream.ConnectToYGOService()
 	db.EstablishSKCDeckAPIDBConn()
 	go api.RunHttpServer()
 	select {}
