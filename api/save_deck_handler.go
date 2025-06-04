@@ -20,8 +20,7 @@ const (
 )
 
 func submitNewDeckListHandler(res http.ResponseWriter, req *http.Request) {
-	logger, ctx := cUtil.NewRequestSetup(
-		cUtil.ContextWithMetadata(context.Background(), apiName, submitNewDeckListOp), submitNewDeckListOp)
+	logger, ctx := cUtil.InitRequest(context.Background(), apiName, submitNewDeckListOp)
 	var deckList model.DeckList
 
 	if err := json.NewDecoder(req.Body).Decode(&deckList); err != nil {
@@ -30,7 +29,7 @@ func submitNewDeckListHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	logger, ctx = cUtil.AddAttribute(ctx, slog.String("deckName", deckList.Name))
+	logger, ctx = cUtil.AddLoggerAttribute(ctx, slog.String("deckName", deckList.Name))
 	logger.Info(fmt.Sprintf("Client attempting to submit new deck with list contents (in base64) {%s}", deckList.ContentB64))
 
 	// object validation

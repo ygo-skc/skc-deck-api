@@ -116,7 +116,7 @@ func (dlb DeckListBreakdown) Validate(ctx context.Context) *cModel.APIError {
 	}
 
 	if msg != "" {
-		cUtil.LoggerFromContext(ctx).Error(msg)
+		cUtil.RetrieveLogger(ctx).Error(msg)
 		return &cModel.APIError{Message: msg, StatusCode: http.StatusBadRequest}
 	} else {
 		return nil

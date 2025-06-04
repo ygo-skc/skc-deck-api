@@ -24,9 +24,7 @@ func getDeckListHandler(res http.ResponseWriter, req *http.Request) {
 	pathVars := mux.Vars(req)
 	deckID := pathVars["deckID"]
 
-	logger, ctx := cUtil.NewRequestSetup(
-		cUtil.ContextWithMetadata(context.Background(), apiName, retrieveDeckListOp),
-		retrieveDeckListOp, slog.String("deck_id", deckID))
+	logger, ctx := cUtil.InitRequest(context.Background(), apiName, retrieveDeckListOp, slog.String("deck_id", deckID))
 	logger.Info(fmt.Sprintf("Getting content for deck w/ ID %s", deckID))
 
 	var deckList *model.DeckList
@@ -56,9 +54,7 @@ func getDecksFeaturingCardHandler(res http.ResponseWriter, req *http.Request) {
 	pathVars := mux.Vars(req)
 	cardID := pathVars["cardID"]
 
-	logger, ctx := cUtil.NewRequestSetup(
-		cUtil.ContextWithMetadata(context.Background(), apiName, retrieveDeckFeaturingCardOp),
-		retrieveDeckFeaturingCardOp, slog.String("card_id", cardID))
+	logger, ctx := cUtil.InitRequest(context.Background(), apiName, retrieveDeckFeaturingCardOp, slog.String("card_id", cardID))
 	logger.Info("Fetching decks that feature card")
 
 	suggestedDecks := model.SuggestedDecks{}

@@ -42,7 +42,7 @@ func DeserializeDeckList(ctx context.Context, dl string) (*model.DeckListBreakdo
 // Transforms decoded deck list into a map that can be parsed easier.
 // The map will use the cardID as key and number of copies in the deck as value.
 func transformDeckListStringToMap(ctx context.Context, list string) (model.DeckListBreakdown, *cModel.APIError) {
-	logger := cUtil.LoggerFromContext(ctx)
+	logger := cUtil.RetrieveLogger(ctx)
 	tokens := deckListCardAndQuantityRegex.FindAllString(list, -1)
 
 	cardCopiesInDeck := map[string]int{}

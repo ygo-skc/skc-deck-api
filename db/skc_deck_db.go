@@ -33,7 +33,7 @@ type SKCDeckAPIDAOImplementation struct{}
 
 // Retrieves the version number of the SKC Deck API DB or throws an error if an exception occurs.
 func (dbInterface SKCDeckAPIDAOImplementation) GetSKCDeckAPIDBVersion(ctx context.Context) (string, error) {
-	logger := cUtil.LoggerFromContext(ctx)
+	logger := cUtil.RetrieveLogger(ctx)
 
 	var commandResult bson.M
 	command := bson.D{{Key: "serverStatus", Value: 1}}
@@ -51,7 +51,7 @@ func (dbInterface SKCDeckAPIDAOImplementation) GetSKCDeckAPIDBVersion(ctx contex
 
 func (dbInterface SKCDeckAPIDAOImplementation) InsertDeckList(ctx context.Context,
 	deckList model.DeckList) *cModel.APIError {
-	logger := cUtil.LoggerFromContext(ctx)
+	logger := cUtil.RetrieveLogger(ctx)
 
 	deckList.CreatedAt = time.Now()
 	deckList.UpdatedAt = deckList.CreatedAt
@@ -73,7 +73,7 @@ func (dbInterface SKCDeckAPIDAOImplementation) InsertDeckList(ctx context.Contex
 }
 
 func (dbInterface SKCDeckAPIDAOImplementation) GetDeckList(ctx context.Context, deckID string) (*model.DeckList, *cModel.APIError) {
-	logger := cUtil.LoggerFromContext(ctx)
+	logger := cUtil.RetrieveLogger(ctx)
 
 	if objectId, err := bson.ObjectIDFromHex(deckID); err != nil {
 		logger.Error("Error retrieving deck from DB - nvalid deck ID")
@@ -98,7 +98,7 @@ func (dbInterface SKCDeckAPIDAOImplementation) GetDeckList(ctx context.Context, 
 
 func (dbInterface SKCDeckAPIDAOImplementation) GetDecksThatFeatureCards(ctx context.Context,
 	cardIDs []string) (*[]model.DeckList, *cModel.APIError) {
-	logger := cUtil.LoggerFromContext(ctx)
+	logger := cUtil.RetrieveLogger(ctx)
 
 	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()

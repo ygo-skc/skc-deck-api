@@ -17,9 +17,7 @@ const (
 // Handler for status/health check endpoint of the api.
 // Will get status of downstream services as well to help isolate problems.
 func getAPIStatusHandler(res http.ResponseWriter, req *http.Request) {
-	logger, ctx := cUtil.NewRequestSetup(
-		cUtil.ContextWithMetadata(context.Background(), apiName, statusOp),
-		statusOp)
+	logger, ctx := cUtil.InitRequest(context.Background(), apiName, statusOp)
 
 	downstreamHealth := []cModel.DownstreamItem{}
 
