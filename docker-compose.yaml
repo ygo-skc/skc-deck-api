@@ -33,6 +33,7 @@ services:
             "pattern" : "\"app.flow\":\"Status\""
           }]
         }]
+      com.datadoghq.tags.runtime: "golang"
       com.datadoghq.tags.env: "prod"
       com.datadoghq.tags.service: "skc-deck-api"
 
