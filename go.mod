@@ -10,7 +10,7 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/ygo-skc/skc-go/common v1.4.0
 	go.mongodb.org/mongo-driver/v2 v2.2.2
-	google.golang.org/grpc v1.72.2
+	google.golang.org/grpc v1.73.0
 )
 
 require (
