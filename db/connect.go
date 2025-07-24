@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"time"
 
 	cUtil "github.com/ygo-skc/skc-go/common/util"
@@ -42,4 +43,6 @@ func EstablishSKCDeckAPIDBConn() {
 
 	// init collections
 	deckListCollection = skcDeckDB.Collection("lists")
+
+	slog.Info("Connected to deck DB")
 }

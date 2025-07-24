@@ -4,13 +4,14 @@ package api
 import (
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"log/slog"
 	"net/http"
 	"strings"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/rs/cors"
 	"github.com/ygo-skc/skc-deck-api/db"
 	cModel "github.com/ygo-skc/skc-go/common/model"
@@ -71,8 +72,8 @@ func commonResponseMiddleware(next http.Handler) http.Handler {
 		if strings.Contains(req.Header.Get("Accept-Encoding"), "gzip") {
 			res.Header().Set("Content-Encoding", "gzip")
 			zip := gzip.NewWriter(res)
-			defer zip.Close()
 			next.ServeHTTP(gzipResponseWriter{Writer: zip, ResponseWriter: res}, req)
+			zip.Close()
 		} else {
 			next.ServeHTTP(res, req)
 		}
@@ -83,21 +84,25 @@ func commonResponseMiddleware(next http.Handler) http.Handler {
 // This method should be called before the environment is set up as the API Key will be set according to the value found in environment
 func RunHttpServer() {
 	serverAPIKey = cUtil.EnvMap["API_KEY"] // configure API Key
-	router := mux.NewRouter()
-
-	// configure non-admin routes
-	unprotectedRoutes := router.PathPrefix(apiContext).Subrouter()
-	unprotectedRoutes.HandleFunc("/status", getAPIStatusHandler)
-	unprotectedRoutes.HandleFunc("", submitNewDeckListHandler).Methods(http.MethodPost).Name("Deck List Submission")
-	unprotectedRoutes.HandleFunc("/card/{cardID:[0-9]{8}}", getDecksFeaturingCardHandler).Methods(http.MethodGet).Name("Deck Featuring Card")
-	unprotectedRoutes.HandleFunc("/{deckID:[0-9a-z]+}", getDeckListHandler).Methods(http.MethodGet).Name("Retrieve Info On Deck")
-
-	// admin routes
-	protectedRoutes := router.PathPrefix(apiContext).Subrouter()
-	protectedRoutes.Use(verifyAPIKeyMiddleware)
+	router := chi.NewRouter()
 
 	// common middleware
 	router.Use(commonResponseMiddleware)
+
+	router.Route(apiContext, func(r chi.Router) {
+		// configure non-admin routes
+		r.Group(func(r chi.Router) {
+			r.Get("/status", getAPIStatusHandler)
+			r.Post("/", submitNewDeckListHandler)
+			r.Get("/card/{cardID:[0-9]{8}}", getDecksFeaturingCardHandler)
+			r.Get("/{deckID:[0-9a-z]+}", getDeckListHandler)
+		})
+
+		// admin routes
+		r.Group(func(r chi.Router) {
+			r.Use(verifyAPIKeyMiddleware)
+		})
+	})
 
 	// Cors
 	corsOpts := cors.New(cors.Options{
@@ -117,12 +122,15 @@ func RunHttpServer() {
 	serveTLS(router, corsOpts)
 }
 
-// configure server to handle HTTPS (secured) calls
-func serveTLS(router *mux.Router, corsOpts *cors.Cors) {
-	slog.Debug("Starting server in port 9010 (secured)")
-
+// Configures and starts an HTTPS server with TLS encryption.
+// It combines the TLS certificate and CA bundle, and utilizes the private key.
+// Finally, it applies CORS middleware.
+func serveTLS(router *chi.Mux, corsOpts *cors.Cors) {
 	cUtil.CombineCerts("certs")
-	if err := http.ListenAndServeTLS(":9010", "certs/concatenated.crt", "certs/private.key", corsOpts.Handler(router)); err != nil {
+	port := 9010
+	slog.Info(fmt.Sprintf("API starting on port %d", port))
+
+	if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", port), "certs/concatenated.crt", "certs/private.key", corsOpts.Handler(router)); err != nil {
 		log.Fatalf("There was an error starting api server: %s", err)
 	}
 }

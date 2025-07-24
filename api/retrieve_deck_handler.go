@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/ygo-skc/skc-deck-api/io"
 	"github.com/ygo-skc/skc-deck-api/model"
 	cModel "github.com/ygo-skc/skc-go/common/model"
@@ -21,8 +21,7 @@ const (
 )
 
 func getDeckListHandler(res http.ResponseWriter, req *http.Request) {
-	pathVars := mux.Vars(req)
-	deckID := pathVars["deckID"]
+	deckID := chi.URLParam(req, "deckID")
 
 	logger, ctx := cUtil.InitRequest(context.Background(), apiName, retrieveDeckListOp, slog.String("deck_id", deckID))
 	logger.Info(fmt.Sprintf("Getting content for deck w/ ID %s", deckID))
@@ -51,8 +50,7 @@ func getDeckListHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 func getDecksFeaturingCardHandler(res http.ResponseWriter, req *http.Request) {
-	pathVars := mux.Vars(req)
-	cardID := pathVars["cardID"]
+	cardID := chi.URLParam(req, "cardID")
 
 	logger, ctx := cUtil.InitRequest(context.Background(), apiName, retrieveDeckFeaturingCardOp, slog.String("card_id", cardID))
 	logger.Info("Fetching decks that feature card")
