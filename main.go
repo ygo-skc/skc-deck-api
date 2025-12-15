@@ -7,7 +7,7 @@ import (
 	"github.com/ygo-skc/skc-deck-api/api"
 	"github.com/ygo-skc/skc-deck-api/db"
 	"github.com/ygo-skc/skc-deck-api/downstream"
-	cUtil "github.com/ygo-skc/skc-go/common/util"
+	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
 	_ "google.golang.org/grpc/encoding/gzip"
 )
 
