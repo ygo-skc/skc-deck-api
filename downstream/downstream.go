@@ -3,8 +3,8 @@ package downstream
 import (
 	"log"
 
-	"github.com/ygo-skc/skc-go/common/client"
-	cUtil "github.com/ygo-skc/skc-go/common/util"
+	"github.com/ygo-skc/skc-go/common/v2/client"
+	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
 )
 
 var (

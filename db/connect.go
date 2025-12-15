@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"time"
 
-	cUtil "github.com/ygo-skc/skc-go/common/util"
+	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"go.mongodb.org/mongo-driver/v2/mongo/readconcern"

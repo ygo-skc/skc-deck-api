@@ -11,8 +11,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/ygo-skc/skc-deck-api/io"
 	"github.com/ygo-skc/skc-deck-api/model"
-	cModel "github.com/ygo-skc/skc-go/common/model"
-	cUtil "github.com/ygo-skc/skc-go/common/util"
+	cModel "github.com/ygo-skc/skc-go/common/v2/model"
+	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
 )
 
 const (
