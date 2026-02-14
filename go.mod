@@ -1,6 +1,6 @@
 module github.com/ygo-skc/skc-deck-api
 
-go 1.25
+go 1.26
 
 require (
 	github.com/go-chi/chi/v5 v5.2.5
@@ -8,7 +8,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/rs/cors v1.11.1
-	github.com/ygo-skc/skc-go/common/v2 v2.1.2
+	github.com/ygo-skc/skc-go/common/v2 v2.1.3
 	go.mongodb.org/mongo-driver/v2 v2.5.0
 	google.golang.org/grpc v1.79.1
 	google.golang.org/protobuf v1.36.11
