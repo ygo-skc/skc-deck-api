@@ -3,6 +3,7 @@ package api
 
 import (
 	"compress/gzip"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,12 +11,15 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/cors"
 	"github.com/ygo-skc/skc-deck-api/db"
 	cModel "github.com/ygo-skc/skc-go/common/v2/model"
 	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
+	"golang.org/x/net/http2"
 )
 
 const (
@@ -26,6 +30,13 @@ const (
 var (
 	skcDeckAPIDBInterface db.SKCDeckAPIDAO = db.SKCDeckAPIDAOImplementation{}
 	serverAPIKey          string
+
+	gzipPool = sync.Pool{
+		New: func() any {
+			w, _ := gzip.NewWriterLevel(io.Discard, 2)
+			return w
+		},
+	}
 )
 
 type gzipResponseWriter struct {
@@ -69,15 +80,28 @@ func commonResponseMiddleware(next http.Handler) http.Handler {
 		res.Header().Add("Cache-Control", "max-age=300")
 
 		// gzip
-		if strings.Contains(req.Header.Get("Accept-Encoding"), "gzip") {
+		if acceptsGzip(req) {
+			zip := gzipPool.Get().(*gzip.Writer)
+			zip.Reset(res)
+			defer zip.Close()
+			defer gzipPool.Put(zip)
+
 			res.Header().Set("Content-Encoding", "gzip")
-			zip := gzip.NewWriter(res)
+			res.Header().Del("Content-Length")
 			next.ServeHTTP(gzipResponseWriter{Writer: zip, ResponseWriter: res}, req)
-			zip.Close()
 		} else {
 			next.ServeHTTP(res, req)
 		}
 	})
+}
+
+func acceptsGzip(req *http.Request) bool {
+	for _, val := range strings.Split(req.Header.Get("Accept-Encoding"), ",") {
+		if strings.TrimSpace(strings.Split(val, ";")[0]) == "gzip" {
+			return true
+		}
+	}
+	return false
 }
 
 // Configures routes and their middle wares
@@ -128,9 +152,43 @@ func RunHttpServer() {
 func serveTLS(router *chi.Mux, corsOpts *cors.Cors) {
 	cUtil.CombineCerts("certs")
 	port := 9010
+
+	tlsCfg := &tls.Config{
+		MinVersion: tls.VersionTLS13,
+		NextProtos: []string{"h2"},
+		CurvePreferences: []tls.CurveID{
+			tls.X25519,
+			tls.CurveP256,
+		},
+	}
+
+	server := &http.Server{
+		Addr:      fmt.Sprintf(":%d", port),
+		Handler:   corsOpts.Handler(router),
+		TLSConfig: tlsCfg,
+
+		ReadTimeout:       6 * time.Second,
+		ReadHeaderTimeout: 2 * time.Second,
+		WriteTimeout:      4 * time.Second,
+		IdleTimeout:       15 * time.Second,
+
+		MaxHeaderBytes: 64 << 10,
+	}
+
+	if err := http2.ConfigureServer(server, &http2.Server{
+		MaxConcurrentStreams:         100,
+		MaxHandlers:                  25,
+		IdleTimeout:                  15 * time.Second,
+		WriteByteTimeout:             4 * time.Second,
+		MaxUploadBufferPerConnection: 10 << 10,
+		MaxUploadBufferPerStream:     10 << 10,
+	}); err != nil {
+		log.Fatalf("Failed to configure HTTP/2: %v", err)
+	}
+
 	slog.Info(fmt.Sprintf("API starting on port %d", port))
 
-	if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", port), "certs/concatenated.crt", "certs/private.key", corsOpts.Handler(router)); err != nil {
+	if err := server.ListenAndServeTLS("certs/concatenated.crt", "certs/private.key"); err != nil {
 		log.Fatalf("There was an error starting api server: %s", err)
 	}
 }
