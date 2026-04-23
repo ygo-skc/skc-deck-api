@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	cModel "github.com/ygo-skc/skc-go/common/v2/model"
@@ -84,19 +85,20 @@ func (dlb *DeckListBreakdown) GetQuantities() ([]Content, []Content) {
 }
 
 func (dlb DeckListBreakdown) ListStringCleanup() string {
-	formattedDLS := "Main Deck\n"
+	var formattedDLS strings.Builder
+	formattedDLS.WriteString("Main Deck\n")
 
 	for _, card := range dlb.MainDeck {
-		formattedDLS += formattedLine(card, dlb.CardQuantity[card.GetID()])
+		formattedDLS.WriteString(formattedLine(card, dlb.CardQuantity[card.GetID()]))
 	}
 
-	formattedDLS += "\nExtra Deck\n"
+	formattedDLS.WriteString("\nExtra Deck\n")
 
 	for _, card := range dlb.ExtraDeck {
-		formattedDLS += formattedLine(card, dlb.CardQuantity[card.GetID()])
+		formattedDLS.WriteString(formattedLine(card, dlb.CardQuantity[card.GetID()]))
 	}
 
-	return formattedDLS
+	return formattedDLS.String()
 }
 
 func formattedLine(card cModel.YGOCard, quantity int) string {

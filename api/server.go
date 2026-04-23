@@ -96,7 +96,7 @@ func commonResponseMiddleware(next http.Handler) http.Handler {
 }
 
 func acceptsGzip(req *http.Request) bool {
-	for _, val := range strings.Split(req.Header.Get("Accept-Encoding"), ",") {
+	for val := range strings.SplitSeq(req.Header.Get("Accept-Encoding"), ",") {
 		if strings.TrimSpace(strings.Split(val, ";")[0]) == "gzip" {
 			return true
 		}
