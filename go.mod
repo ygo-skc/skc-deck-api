@@ -11,7 +11,7 @@ require (
 	github.com/ygo-skc/skc-go/common/v2 v2.1.5
 	go.mongodb.org/mongo-driver/v2 v2.6.0
 	golang.org/x/net v0.54.0
-	google.golang.org/grpc v1.81.0
+	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 )
 
