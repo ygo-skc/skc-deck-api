@@ -7,9 +7,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -23,8 +23,9 @@ import (
 )
 
 const (
-	apiContext = "/api/v1/deck"
-	apiName    = "skc-deck-api"
+	v1Context = "/api/v1/deck"
+	apiName   = "skc-deck-api"
+	apiPort   = 9010
 )
 
 var (
@@ -48,43 +49,42 @@ func (w gzipResponseWriter) Write(b []byte) (int, error) {
 	return w.Writer.Write(b)
 }
 
-// verifies API Key from request header is the correct API Key
 func verifyApiKey(headers http.Header) *cModel.APIError {
 	clientKey := headers.Get("API-Key")
 
 	if clientKey != serverAPIKey {
-		slog.Error("Client is using incorrect API Key. Cannot process request.")
+		slog.Error("Client is using incorrect API Key. Cannot process request")
 		return &cModel.APIError{Message: "Request has incorrect or missing API Key."}
 	}
 
 	return nil
 }
 
-// middleware used to verify API Key
 func verifyAPIKeyMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		if err := verifyApiKey(req.Header); err != nil {
-			res.Header().Add("Content-Type", "application/json")
+			res.Header().Set("Content-Type", "application/json")
 			res.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(res).Encode(err)
+			if encodingErr := json.NewEncoder(res).Encode(err); encodingErr != nil {
+				slog.Error("Could not encode API key error response", "err", encodingErr, "path", req.URL.Path)
+			}
 		} else {
 			next.ServeHTTP(res, req)
 		}
 	})
 }
 
-// sets common headers for response
 func commonResponseMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		res.Header().Add("Content-Type", "application/json")
-		res.Header().Add("Cache-Control", "max-age=300")
+		res.Header().Set("Content-Type", "application/json")
+		res.Header().Set("Cache-Control", "max-age=300")
 
 		// gzip
 		if acceptsGzip(req) {
 			zip := gzipPool.Get().(*gzip.Writer)
 			zip.Reset(res)
-			defer zip.Close()
 			defer gzipPool.Put(zip)
+			defer zip.Close()
 
 			res.Header().Set("Content-Encoding", "gzip")
 			res.Header().Del("Content-Length")
@@ -113,7 +113,7 @@ func RunHttpServer() {
 	// common middleware
 	router.Use(commonResponseMiddleware)
 
-	router.Route(apiContext, func(r chi.Router) {
+	router.Route(v1Context, func(r chi.Router) {
 		// configure non-admin routes
 		r.Group(func(r chi.Router) {
 			r.Get("/status", getAPIStatusHandler)
@@ -143,6 +143,7 @@ func RunHttpServer() {
 		},
 	})
 
+	cUtil.CombineCerts("certs")
 	serveTLS(router, corsOpts)
 }
 
@@ -150,9 +151,6 @@ func RunHttpServer() {
 // It combines the TLS certificate and CA bundle, and utilizes the private key.
 // Finally, it applies CORS middleware.
 func serveTLS(router *chi.Mux, corsOpts *cors.Cors) {
-	cUtil.CombineCerts("certs")
-	port := 9010
-
 	tlsCfg := &tls.Config{
 		MinVersion: tls.VersionTLS13,
 		NextProtos: []string{"h2"},
@@ -163,7 +161,7 @@ func serveTLS(router *chi.Mux, corsOpts *cors.Cors) {
 	}
 
 	server := &http.Server{
-		Addr:      fmt.Sprintf(":%d", port),
+		Addr:      fmt.Sprintf(":%d", apiPort),
 		Handler:   corsOpts.Handler(router),
 		TLSConfig: tlsCfg,
 
@@ -172,7 +170,7 @@ func serveTLS(router *chi.Mux, corsOpts *cors.Cors) {
 		WriteTimeout:      4 * time.Second,
 		IdleTimeout:       15 * time.Second,
 
-		MaxHeaderBytes: 64 << 10,
+		MaxHeaderBytes: 32 << 10,
 	}
 
 	if err := http2.ConfigureServer(server, &http2.Server{
@@ -180,15 +178,17 @@ func serveTLS(router *chi.Mux, corsOpts *cors.Cors) {
 		MaxHandlers:                  25,
 		IdleTimeout:                  15 * time.Second,
 		WriteByteTimeout:             4 * time.Second,
-		MaxUploadBufferPerConnection: 10 << 10,
-		MaxUploadBufferPerStream:     10 << 10,
+		MaxUploadBufferPerConnection: 20 << 10,
+		MaxUploadBufferPerStream:     4 << 10,
 	}); err != nil {
-		log.Fatalf("Failed to configure HTTP/2: %v", err)
+		slog.Error("Failed to configure HTTP/2", "err", err)
+		os.Exit(1)
 	}
 
-	slog.Info(fmt.Sprintf("API starting on port %d", port))
+	slog.Info("API starting", "port", apiPort)
 
 	if err := server.ListenAndServeTLS("certs/concatenated.crt", "certs/private.key"); err != nil {
-		log.Fatalf("There was an error starting api server: %s", err)
+		slog.Error("There was an error starting api server", "err", err)
+		os.Exit(1)
 	}
 }
