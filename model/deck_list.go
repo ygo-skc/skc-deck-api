@@ -13,7 +13,7 @@ import (
 )
 
 type SuggestedDecks struct {
-	FeaturedIn *[]DeckList `json:"featuredIn"`
+	FeaturedIn []DeckList `json:"featuredIn"`
 }
 
 type DeckList struct {

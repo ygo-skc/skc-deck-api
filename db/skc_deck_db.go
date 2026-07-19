@@ -25,7 +25,7 @@ type SKCDeckAPIDAO interface {
 
 	InsertDeckList(context.Context, model.DeckList) *cModel.APIError
 	GetDeckList(context.Context, string) (*model.DeckList, *cModel.APIError)
-	GetDecksThatFeatureCards(context.Context, []string) (*[]model.DeckList, *cModel.APIError)
+	GetDecksThatFeatureCards(context.Context, []string) ([]model.DeckList, *cModel.APIError)
 }
 
 // impl
@@ -100,7 +100,7 @@ func (dbInterface SKCDeckAPIDAOImplementation) GetDeckList(ctx context.Context, 
 }
 
 func (dbInterface SKCDeckAPIDAOImplementation) GetDecksThatFeatureCards(ctx context.Context,
-	cardIDs []string) (*[]model.DeckList, *cModel.APIError) {
+	cardIDs []string) ([]model.DeckList, *cModel.APIError) {
 	logger := cUtil.RetrieveLogger(ctx)
 
 	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
@@ -124,6 +124,6 @@ func (dbInterface SKCDeckAPIDAOImplementation) GetDecksThatFeatureCards(ctx cont
 			return nil, &cModel.APIError{Message: "Error retrieving deck suggestions", StatusCode: http.StatusInternalServerError}
 		}
 
-		return &dl, nil
+		return dl, nil
 	}
 }
