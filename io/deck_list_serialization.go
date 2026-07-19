@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	deckListCardAndQuantityRegex = regexp.MustCompile("[1-3][xX][0-9]{8}")
+	deckListCardAndQuantityRegex = regexp.MustCompile(`\b[1-3][xX][0-9]{8}\b`)
 )
 
 func DeserializeDeckList(ctx context.Context, dl string) (*model.DeckListBreakdown, *cModel.APIError) {

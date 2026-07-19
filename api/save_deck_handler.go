@@ -63,6 +63,7 @@ func submitNewDeckListHandler(res http.ResponseWriter, req *http.Request) {
 	if err := skcDeckAPIDBInterface.InsertDeckList(ctx, deckList); err != nil {
 		err.HandleServerResponse(res)
 	} else {
+		res.WriteHeader(http.StatusOK)
 		json.NewEncoder(res).Encode(cModel.Success{Message: "Successfully inserted new deck list: " + deckList.Name})
 	}
 }
