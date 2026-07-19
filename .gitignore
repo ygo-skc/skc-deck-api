@@ -34,3 +34,5 @@ coverage.*
 
 /**__debug**
 skc-deck-api
+
+deck/
