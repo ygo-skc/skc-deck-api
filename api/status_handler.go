@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	cModel "github.com/ygo-skc/skc-go/common/v2/model"
@@ -33,7 +32,7 @@ func getAPIStatusHandler(res http.ResponseWriter, req *http.Request) {
 
 	status := cModel.APIHealth{Version: "1.0.0", Downstream: downstreamHealth}
 
-	logger.Info(fmt.Sprintf("API Status Info! SKC Deck API DB version: %s", skcDeckAPIDB))
+	logger.Info("API status check completed", "db_version", skcDeckAPIDB)
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(status)
 }

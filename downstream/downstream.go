@@ -1,7 +1,8 @@
 package downstream
 
 import (
-	"log"
+	"log/slog"
+	"os"
 
 	"github.com/ygo-skc/skc-go/common/v2/client"
 	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
@@ -13,7 +14,8 @@ var (
 
 func ConnectToYGOService() {
 	if c, err := client.NewYGOServiceClients("ygo-service.skc.cards", cUtil.EnvMap["YGO_SERVICE_HOST"]); err != nil {
-		log.Fatalf("Failed to connect to ygo-service: %v", err)
+		slog.Error("Failed to connect to ygo-service", "err", err)
+		os.Exit(1)
 	} else {
 		YGO = *c
 	}

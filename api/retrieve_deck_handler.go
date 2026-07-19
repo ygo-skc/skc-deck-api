@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -24,7 +23,7 @@ func getDeckListHandler(res http.ResponseWriter, req *http.Request) {
 	deckID := chi.URLParam(req, "deckID")
 
 	logger, ctx := cUtil.InitRequest(context.Background(), apiName, retrieveDeckListOp, slog.String("deck_id", deckID))
-	logger.Info(fmt.Sprintf("Getting content for deck w/ ID %s", deckID))
+	logger.Info("Getting content for deck")
 
 	var deckList *model.DeckList
 	var err *cModel.APIError
@@ -43,8 +42,12 @@ func getDeckListHandler(res http.ResponseWriter, req *http.Request) {
 	}
 	deckList.MainDeck, deckList.ExtraDeck = deckListBreakdown.GetQuantities()
 
-	logger.Info(fmt.Sprintf("Successfully retrieved deck list. Name {%s} and encoded deck list content {%s}. This deck list has {%d} main deck cards and {%d} extra deck cards.",
-		deckList.Name, deckList.ContentB64, deckList.NumMainDeckCards, deckList.NumExtraDeckCards))
+	logger.Info("Successfully retrieved deck list",
+		"deck_name", deckList.Name,
+		"content_b64", deckList.ContentB64,
+		"num_main_deck_cards", deckList.NumMainDeckCards,
+		"num_extra_deck_cards", deckList.NumExtraDeckCards,
+	)
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(deckList)
 }

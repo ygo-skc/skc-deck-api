@@ -2,8 +2,8 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"log/slog"
+	"os"
 	"time"
 
 	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
@@ -36,7 +36,8 @@ func EstablishSKCDeckAPIDBConn() {
 		SetWriteConcern(writeconcern.Majority()). // writes to most replicas before acknowledging the write is complete
 		SetCompressors([]string{"zlib"}).
 		SetAppName("SKC Deck API")); err != nil {
-		log.Fatalln("Error creating new mongodb client for skc-deck-api-db", err)
+		slog.Error("Error creating new mongodb client for skc-deck-api-db", "err", err)
+		os.Exit(1)
 	} else {
 		skcDeckDB = client.Database("deckDB")
 	}

@@ -2,10 +2,9 @@ package validation
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"log/slog"
 	"net/http"
+	"os"
 	"regexp"
 
 	"github.com/go-playground/locales/en"
@@ -35,7 +34,8 @@ func init() {
 	var found bool
 	Translator, found = uni.GetTranslator("en")
 	if !found {
-		log.Fatal("translator not found")
+		slog.Error("Translator not found", "locale", "en")
+		os.Exit(1)
 	}
 
 	configureTranslations()
@@ -64,6 +64,6 @@ func handleValidationErrors(err validator.ValidationErrors) *ValidationErrors {
 	}
 
 	ve := ValidationErrors{Errors: validationErrors, TotalErrors: len(validationErrors)}
-	slog.Error(fmt.Sprintf("There were %d errors while validating input. Errors: %s", ve.TotalErrors, ve.Errors))
+	slog.Error("Errors occurred while validating input", "total_errors", ve.TotalErrors, "errors", ve.Errors)
 	return &ve
 }

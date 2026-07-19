@@ -18,10 +18,10 @@ func configureCustomValidators() {
 
 		for ind, mascot := range mascots {
 			if ind == 3 { // size constraint fails
-				slog.Error("Deck Mascot array failed size constraint.")
+				slog.Error("Deck Mascot array failed size constraint", "mascot_count", len(mascots))
 				return false
 			} else if len(cardIDRegex.FindAllString(mascot, -1)) == 0 { // regex constraint
-				slog.Error("Deck Mascot ID not in proper format.")
+				slog.Error("Deck Mascot ID not in proper format", "mascot_id", mascot)
 				return false
 			}
 		}

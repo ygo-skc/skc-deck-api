@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -24,13 +23,13 @@ func submitNewDeckListHandler(res http.ResponseWriter, req *http.Request) {
 	var deckList model.DeckList
 
 	if err := json.NewDecoder(req.Body).Decode(&deckList); err != nil {
-		logger.Error("Error occurred while reading submitNewDeckListHandler request body.")
+		logger.Error("Error occurred while reading submitNewDeckListHandler request body", "err", err)
 		cModel.HandleServerResponse(cModel.APIError{Message: "Body could not be deserialized.", StatusCode: http.StatusUnprocessableEntity}, res)
 		return
 	}
 
-	logger, ctx = cUtil.AddLoggerAttribute(ctx, slog.String("deckName", deckList.Name))
-	logger.Info(fmt.Sprintf("Client attempting to submit new deck with list contents (in base64) {%s}", deckList.ContentB64))
+	logger, ctx = cUtil.AddLoggerAttribute(ctx, slog.String("deck_name", deckList.Name))
+	logger.Info("Client attempting to submit new deck list", "content_b64", deckList.ContentB64)
 
 	// object validation
 	if err := validation.Validate(deckList); err != nil {

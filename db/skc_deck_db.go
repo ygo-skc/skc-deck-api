@@ -42,7 +42,7 @@ func (dbInterface SKCDeckAPIDAOImplementation) GetSKCDeckAPIDBVersion(ctx contex
 	defer cancel()
 
 	if err := skcDeckDB.RunCommand(ctx, command).Decode(&commandResult); err != nil {
-		logger.Info(fmt.Sprintf("Error getting SKC Deck API DB version %v", err))
+		logger.Info("Error getting SKC Deck API DB version", "err", err)
 		return "", err
 	} else {
 		return fmt.Sprintf("%v", commandResult["version"]), nil
@@ -56,18 +56,21 @@ func (dbInterface SKCDeckAPIDAOImplementation) InsertDeckList(ctx context.Contex
 	deckList.CreatedAt = time.Now()
 	deckList.UpdatedAt = deckList.CreatedAt
 
-	logger.Info(
-		fmt.Sprintf("Inserting deck with name %s with Main Deck size %d and Extra Deck size %d. List contents (in base64 and possibly reformatted) %s",
-			deckList.Name, deckList.NumMainDeckCards, deckList.NumExtraDeckCards, deckList.ContentB64))
+	logger.Info("Inserting deck list",
+		"deck_name", deckList.Name,
+		"num_main_deck_cards", deckList.NumMainDeckCards,
+		"num_extra_deck_cards", deckList.NumExtraDeckCards,
+		"content_b64", deckList.ContentB64,
+	)
 
 	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
 	if res, err := deckListCollection.InsertOne(ctx, deckList); err != nil {
-		logger.Error(fmt.Sprintf("Error saving new deck list into DB, error: %v", err))
+		logger.Error("Error saving new deck list into DB", "err", err)
 		return &cModel.APIError{Message: "There was a problem saving deck list", StatusCode: http.StatusInternalServerError}
 	} else {
-		logger.Info(fmt.Sprintf("Successfully inserted new deck list into DB, deck ID: %s", res.InsertedID))
+		logger.Info("Successfully inserted new deck list into DB", "deck_id", res.InsertedID)
 		return nil
 	}
 }
@@ -76,7 +79,7 @@ func (dbInterface SKCDeckAPIDAOImplementation) GetDeckList(ctx context.Context, 
 	logger := cUtil.RetrieveLogger(ctx)
 
 	if objectId, err := bson.ObjectIDFromHex(deckID); err != nil {
-		logger.Error("Error retrieving deck from DB - nvalid deck ID")
+		logger.Error("Error retrieving deck from DB - invalid deck ID", "deck_id", deckID)
 		return nil, &cModel.APIError{Message: "Deck ID not valid", StatusCode: http.StatusBadRequest}
 	} else {
 		ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
@@ -84,7 +87,7 @@ func (dbInterface SKCDeckAPIDAOImplementation) GetDeckList(ctx context.Context, 
 
 		var dl model.DeckList
 		if err := deckListCollection.FindOne(ctx, bson.M{"_id": objectId}).Decode(&dl); err != nil {
-			logger.Error(fmt.Sprintf("Error retrieving deck from DB. Err: %v", err))
+			logger.Error("Error retrieving deck from DB", "deck_id", deckID, "err", err)
 			if err.Error() == "mongo: no documents in result" {
 				return nil, &cModel.APIError{Message: "Deck w/ ID not found", StatusCode: http.StatusNotFound}
 			} else {
@@ -112,12 +115,12 @@ func (dbInterface SKCDeckAPIDAOImplementation) GetDecksThatFeatureCards(ctx cont
 	)
 
 	if cursor, err := deckListCollection.Find(ctx, bson.M{"uniqueCards": bson.M{"$in": cardIDs}}, opts); err != nil {
-		logger.Error(fmt.Sprintf("Error retrieving all deck lists that feature cards w/ ID %v. Err: %v", cardIDs, err))
+		logger.Error("Error retrieving all deck lists that feature cards", "card_ids", cardIDs, "err", err)
 		return nil, &cModel.APIError{Message: "Error retrieving deck suggestions", StatusCode: http.StatusInternalServerError}
 	} else {
 		dl := []model.DeckList{}
 		if err := cursor.All(ctx, &dl); err != nil {
-			logger.Error(fmt.Sprintf("Error retrieving all deck lists that feature cards w/ ID %v. Err: %v", cardIDs, err))
+			logger.Error("Error retrieving all deck lists that feature cards", "card_ids", cardIDs, "err", err)
 			return nil, &cModel.APIError{Message: "Error retrieving deck suggestions", StatusCode: http.StatusInternalServerError}
 		}
 
