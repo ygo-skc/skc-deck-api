@@ -84,7 +84,7 @@ func (dlb *DeckListBreakdown) GetQuantities() ([]Content, []Content) {
 	return mainDeckContent, extraDeckContent
 }
 
-func (dlb DeckListBreakdown) ListStringCleanup() string {
+func (dlb *DeckListBreakdown) ListStringCleanup() string {
 	var formattedDLS strings.Builder
 	formattedDLS.WriteString("Main Deck\n")
 
@@ -105,7 +105,7 @@ func formattedLine(card cModel.YGOCard, quantity int) string {
 	return fmt.Sprintf("%dx%s|%s\n", quantity, card.GetID(), card.GetName())
 }
 
-func (dlb DeckListBreakdown) Validate(ctx context.Context) *cModel.APIError {
+func (dlb *DeckListBreakdown) Validate(ctx context.Context) *cModel.APIError {
 	var msg = ""
 
 	if len(dlb.InvalidIDs) > 0 {
