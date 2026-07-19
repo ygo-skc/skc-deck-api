@@ -64,7 +64,12 @@ func getDecksFeaturingCardHandler(res http.ResponseWriter, req *http.Request) {
 
 	suggestedDecks := model.SuggestedDecks{}
 
-	suggestedDecks.FeaturedIn, _ = skcDeckAPIDBInterface.GetDecksThatFeatureCards(ctx, []string{cardID})
+	if featuredIn, err := skcDeckAPIDBInterface.GetDecksThatFeatureCards(ctx, []string{cardID}); err != nil {
+		err.HandleServerResponse(res)
+		return
+	} else {
+		suggestedDecks.FeaturedIn = featuredIn
+	}
 
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(suggestedDecks)

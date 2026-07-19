@@ -1,7 +1,13 @@
-.PHONY: test coverage help
+.PHONY: generate-grpc test coverage help
+
+# vars
+DECK_PROTO := ./deck
 
 # default
 all: test build
+
+generate-grpc:
+	protoc --go_out=./ --go-grpc_out=./ deck.proto
 
 build:
 	go mod tidy
