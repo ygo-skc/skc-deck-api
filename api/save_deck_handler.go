@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"log/slog"
@@ -19,7 +18,7 @@ const (
 )
 
 func submitNewDeckListHandler(res http.ResponseWriter, req *http.Request) {
-	logger, ctx := cUtil.InitRequest(context.Background(), apiName, submitNewDeckListOp)
+	logger, ctx := cUtil.InitRequest(req.Context(), apiName, submitNewDeckListOp)
 	var deckList model.DeckList
 
 	if err := json.NewDecoder(req.Body).Decode(&deckList); err != nil {

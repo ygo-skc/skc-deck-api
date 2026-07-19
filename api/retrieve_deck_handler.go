@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"log/slog"
@@ -22,7 +21,7 @@ const (
 func getDeckListHandler(res http.ResponseWriter, req *http.Request) {
 	deckID := chi.URLParam(req, "deckID")
 
-	logger, ctx := cUtil.InitRequest(context.Background(), apiName, retrieveDeckListOp, slog.String("deck_id", deckID))
+	logger, ctx := cUtil.InitRequest(req.Context(), apiName, retrieveDeckListOp, slog.String("deck_id", deckID))
 	logger.Info("Getting content for deck")
 
 	var deckList *model.DeckList
@@ -55,7 +54,7 @@ func getDeckListHandler(res http.ResponseWriter, req *http.Request) {
 func getDecksFeaturingCardHandler(res http.ResponseWriter, req *http.Request) {
 	cardID := chi.URLParam(req, "cardID")
 
-	logger, ctx := cUtil.InitRequest(context.Background(), apiName, retrieveDeckFeaturingCardOp, slog.String("card_id", cardID))
+	logger, ctx := cUtil.InitRequest(req.Context(), apiName, retrieveDeckFeaturingCardOp, slog.String("card_id", cardID))
 	logger.Info("Fetching decks that feature card")
 
 	suggestedDecks := model.SuggestedDecks{}

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
@@ -16,7 +15,7 @@ const (
 // Handler for status/health check endpoint of the api.
 // Will get status of downstream services as well to help isolate problems.
 func getAPIStatusHandler(res http.ResponseWriter, req *http.Request) {
-	logger, ctx := cUtil.InitRequest(context.Background(), apiName, statusOp)
+	logger, ctx := cUtil.InitRequest(req.Context(), apiName, statusOp)
 
 	downstreamHealth := []cModel.DownstreamItem{}
 
