@@ -31,7 +31,12 @@ func getDeckListHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	decodedListBytes, _ := base64.StdEncoding.DecodeString(deckList.ContentB64)
+	decodedListBytes, decodeErr := base64.StdEncoding.DecodeString(deckList.ContentB64)
+	if decodeErr != nil {
+		logger.Error("Error decoding deck list", "deck_id", deckID, "content_b64", deckList.ContentB64, "err", decodeErr)
+		(&cModel.APIError{Message: "Deck list could not be decoded.", StatusCode: http.StatusInternalServerError}).HandleServerResponse(res)
+		return
+	}
 	decodedList := string(decodedListBytes) // decoded string of list contents
 
 	var deckListBreakdown *model.DeckListBreakdown
