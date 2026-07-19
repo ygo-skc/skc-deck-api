@@ -60,10 +60,10 @@ func createIndexes() error {
 	defer cancel()
 
 	_, err := deckListCollection.Indexes().CreateMany(ctx, []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uniqueCards", Value: 1}}},
-		{Keys: bson.D{{Key: "createdAt", Value: -1}}},
-		{Keys: bson.D{{Key: "tags", Value: 1}}},
-		{Keys: bson.D{{Key: "uniqueCards", Value: 1}, {Key: "createdAt", Value: -1}}},
+		{Keys: bson.D{{Key: "uniqueCards", Value: 1}}, Options: options.Index().SetName("cards_featured_in_deck")},
+		{Keys: bson.D{{Key: "createdAt", Value: -1}}, Options: options.Index().SetName("decks_by_creation_date_desc")},
+		{Keys: bson.D{{Key: "tags", Value: 1}}, Options: options.Index().SetName("decks_by_tag")},
+		{Keys: bson.D{{Key: "uniqueCards", Value: 1}, {Key: "createdAt", Value: -1}}, Options: options.Index().SetName("cards_featured_in_deck_by_creation_date_desc")},
 	})
 	return err
 }
