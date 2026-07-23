@@ -10,8 +10,8 @@ import (
 
 	"github.com/ygo-skc/skc-deck-api/downstream"
 	"github.com/ygo-skc/skc-deck-api/model"
-	cModel "github.com/ygo-skc/skc-go/common/v2/model"
-	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
+	cModel "github.com/ygo-skc/skc-go/common/v3/model"
+	cUtil "github.com/ygo-skc/skc-go/common/v3/util"
 )
 
 var (
@@ -27,9 +27,10 @@ func DeserializeDeckList(ctx context.Context, dl string) (*model.DeckListBreakdo
 		return nil, err
 	}
 
-	if cardData, err = downstream.YGO.CardService.GetCardsByID(ctx, dlb.CardIDs); err != nil {
+	if cardsProto, err := downstream.YGO.CardService.GetCardsByIDProto(ctx, dlb.CardIDs); err != nil {
 		return nil, err
 	} else {
+		cardData = cModel.BatchCardDataFromProto[cModel.CardIDs](cardsProto, cModel.CardIDAsKey)
 		dlb.AllCards = cardData.CardInfo
 		dlb.InvalidIDs = cardData.UnknownResources
 

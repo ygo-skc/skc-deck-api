@@ -4,7 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/go-playground/validator/v10"
-	cModel "github.com/ygo-skc/skc-go/common/v2/model"
+	cModel "github.com/ygo-skc/skc-go/common/v3/model"
 )
 
 // Add custom validators to handle validation scenarios not supported out of the box.

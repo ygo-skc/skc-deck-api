@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/ygo-skc/skc-go/common/v2/client"
-	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
+	"github.com/ygo-skc/skc-go/common/v3/client"
+	cUtil "github.com/ygo-skc/skc-go/common/v3/util"
 )
 
 var (

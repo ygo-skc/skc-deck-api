@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	cModel "github.com/ygo-skc/skc-go/common/v2/model"
-	cUtil "github.com/ygo-skc/skc-go/common/v2/util"
+	cModel "github.com/ygo-skc/skc-go/common/v3/model"
+	cUtil "github.com/ygo-skc/skc-go/common/v3/util"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
