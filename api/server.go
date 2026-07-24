@@ -60,6 +60,16 @@ func verifyApiKey(headers http.Header) *cModel.APIError {
 	return nil
 }
 
+// ensure path vars are not entities and encoded correctly
+func decodedPathRoutingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		if rctx := chi.RouteContext(req.Context()); rctx != nil {
+			rctx.RoutePath = req.URL.Path
+		}
+		next.ServeHTTP(res, req)
+	})
+}
+
 func verifyAPIKeyMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		if err := verifyApiKey(req.Header); err != nil {
@@ -111,7 +121,7 @@ func RunHttpServer() {
 	router := chi.NewRouter()
 
 	// common middleware
-	router.Use(commonResponseMiddleware)
+	router.Use(decodedPathRoutingMiddleware, commonResponseMiddleware)
 
 	router.Route(v1Context, func(r chi.Router) {
 		// configure non-admin routes
