@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -88,7 +89,7 @@ func (dbInterface SKCDeckAPIDAOImplementation) GetDeckList(ctx context.Context, 
 		var dl model.DeckList
 		if err := deckListCollection.FindOne(ctx, bson.M{"_id": objectId}).Decode(&dl); err != nil {
 			logger.Error("Error retrieving deck from DB", "deck_id", deckID, "err", err)
-			if err.Error() == "mongo: no documents in result" {
+			if errors.Is(err, mongo.ErrNoDocuments) {
 				return nil, &cModel.APIError{Message: "Deck w/ ID not found", StatusCode: http.StatusNotFound}
 			} else {
 				return nil, &cModel.APIError{Message: "Error retrieving deck", StatusCode: http.StatusInternalServerError}
