@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make *)",
+      "Bash(go build *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(go doc *)",
+      "Bash(go run *)",
+      "Bash(go env *)",
+      "Bash(go version *)",
+      "Bash(go list *)",
+      "Bash(go mod tidy)",
+      "Bash(gofmt *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git tag *)",
+      "Bash(git remote -v)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "statusMessage": "gofmt + go vet + go test on changed package",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | { read -r f; case \"$f\" in *.go) gofmt -w \"$f\"; d=$(dirname \"$f\"); go vet \"$d\"; go test \"$d\";; esac; } 2>&1 || true"
+          }
+        ]
+      }
+    ]
+  }
+}
