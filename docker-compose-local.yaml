@@ -20,6 +20,7 @@ services:
       - skc
     environment:
       - SKC_DECK_API_DOT_ENV_FILE=.env_docker_local
+      - GOMEMLIMIT=60MiB
 
 networks:
   skc:

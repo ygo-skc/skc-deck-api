@@ -11,7 +11,7 @@ generate-grpc:
 
 build:
 	go mod tidy
-	env GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -trimpath .
+	env CGO_ENABLED=0 GOOS=linux GOARCH=arm64 GOARM64=v8.2 go build -ldflags="-s -w" -trimpath .
 
 test:
 	go clean -testcache

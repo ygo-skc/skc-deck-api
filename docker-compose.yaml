@@ -20,6 +20,7 @@ services:
       - skc
     environment:
       - SKC_DECK_API_DOT_ENV_FILE=.env_prod
+      - GOMEMLIMIT=60MiB
     labels:
       com.datadoghq.ad.init_configs: "[{}]"
       com.datadoghq.ad.instances: '[{"host":"%%host%%", "port": "%%port%%"}]'
