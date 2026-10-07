@@ -9,7 +9,7 @@ require (
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/rs/cors v1.11.1
 	github.com/ygo-skc/skc-go/common/v3 v3.3.1
-	go.mongodb.org/mongo-driver/v2 v2.9.1
+	go.mongodb.org/mongo-driver/v2 v2.9.2
 	golang.org/x/net v0.59.0
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
