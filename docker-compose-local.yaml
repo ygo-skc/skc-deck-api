@@ -3,24 +3,48 @@ services:
     image: alpine:latest
     command: ./skc-deck-api
     working_dir: /app
+    user: "1000:1000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "9010:9010"
     volumes:
-      - "./skc-deck-api:/app/skc-deck-api"
-      - "./certs/:/app/certs/"
-      - "./.env_docker_local:/app/.env_docker_local"
-      - "/usr/share/zoneinfo/:/usr/share/zoneinfo/"
-      - "./certs/ca_bundle.crt:/etc/ssl/certs/zero-ssl-ca.crt" # trusting zero ssl CA cert in private network. Though its not needed anymore since the golang app will send the CA Bundle, it is still nice to have for reference
-    restart: always
+      - "./skc-deck-api:/app/skc-deck-api:ro"
+      - "./.env_docker_local:/app/.env_docker_local:ro"
+      - "./certs/certificate.crt:/app/certs/certificate.crt:ro"
+      - "./certs/ca_bundle.crt:/app/certs/ca_bundle.crt:ro"
+      - "./certs/private.key:/app/certs/private.key:ro"
+      - "./certs/skc-deck-api-db.pem:/app/certs/skc-deck-api-db.pem:ro"
+      - "./certs/ca_bundle.crt:/etc/ssl/certs/zero-ssl-ca.crt:ro" # trusting zero ssl CA cert in private network. Though its not needed anymore since the golang app will send the CA Bundle, it is still nice to have for reference
+    tmpfs:
+      - "/app/certs:size=64k,mode=0700,uid=1000,gid=1000" # CombineCerts writes certs/concatenated.crt at startup; the input files above are bind-mounted on top
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "9010"]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
     deploy:
       resources:
         limits:
-          memory: 75m
+          memory: 60m
+          cpus: "1.0"
+          pids: 128
+    memswap_limit: 60m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - skc
     environment:
       - SKC_DECK_API_DOT_ENV_FILE=.env_docker_local
-      - GOMEMLIMIT=60MiB
+      - GOMEMLIMIT=48MiB
 
 networks:
   skc:
